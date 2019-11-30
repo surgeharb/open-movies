@@ -1,33 +1,21 @@
-<mat-sidenav-container>
-  <mat-sidenav #sidenav opened="{{sideNav.opened}}" mode="{{sideNav.mode}}" class="z-depth-3">
-    <ul>
-      <li><a routerLink="/">Movies</a></li>
-      <li><a routerLink="/series">Series</a></li>
-    </ul>
-  </mat-sidenav>
+<div id="site-container">
+  <div class="toolbar-spacer"></div>
+  <mat-toolbar color="primary">
+    <mat-toolbar-row class="mat-elevation-z6">
+      <form id="search" [ngClass]="{ 'opened': searchBar.opened }">
+        <button class="back" type="button" mat-icon-button (click)="toggleSearch()"><mat-icon>arrow_back</mat-icon></button>   
+        <input type="text" name="search" #search placeholder="Search for your favorite movie..." autocomplete="off" [(ngModel)]="searchBar.input" (keyup)="searchTerm$.next($event.target.value)" />   
+      </form>
+      <button type="button" mat-icon-button (click)="getBack()" *ngIf="inDetails">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h5 id="title">Latest Torrents</h5>
+      <span class="flex-spacer"></span>
+      <button type="button" mat-icon-button (click)="toggleSearch()" *ngIf="!inDetails">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
 
-  <div id="page-container">
-    <div class="toolbar-spacer"></div>
-    <mat-toolbar color="primary">
-      <mat-toolbar-row class="mat-elevation-z6">
-        <!-- <form id="search" [ngClass]="{ 'opened': searchBar.opened }">
-            <button class="back" type="button" mat-icon-button (click)="toggleSearch()"><mat-icon>arrow_back</mat-icon></button>   
-            <input type="text" name="search" #search placeholder="Search your favorite movie..." autocomplete="off" [(ngModel)]="searchBar.input" (keyup)="searchTerm$.next($event.target.value)" />   
-          </form> -->
-        <button type="button" mat-icon-button (click)="sidenav.toggle()" *ngIf="!inDetails">
-          <mat-icon>menu</mat-icon>
-        </button>
-        <button type="button" mat-icon-button (click)="getBack()" *ngIf="inDetails">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-        <h5 id="title">Latest Torrents</h5>
-        <span class="flex-spacer"></span>
-        <button type="button" mat-icon-button (click)="toggleSearch()" *ngIf="!inDetails">
-          <mat-icon>search</mat-icon>
-        </button>
-      </mat-toolbar-row>
-    </mat-toolbar>
-
-    <router-outlet></router-outlet>
-  </div>
-</mat-sidenav-container>
+  <router-outlet></router-outlet>
+</div>

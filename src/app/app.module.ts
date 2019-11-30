@@ -1,16 +1,16 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from './@core/modules/material.module';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
+import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
 import { TorrentsService } from './@core/services/torrents.service';
-import { AppRoutingModule } from './app-routing.module';
-import { MaterialModule } from './@core/modules/material.module';
-import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
-import { FormsModule } from '@angular/forms';
 
 import { TorrentsModule } from './torrents/torrents.module';
-import { TorrentsComponent } from './torrents/torrents.component';
+import { TorrentDetailsModule } from './torrent-details/torrent-details.module';
 
 @NgModule({
   declarations: [
@@ -25,6 +25,7 @@ import { TorrentsComponent } from './torrents/torrents.component';
     BrowserAnimationsModule,
 
     TorrentsModule,
+    TorrentDetailsModule,
   ],
   providers: [TorrentsService],
   bootstrap: [AppComponent]

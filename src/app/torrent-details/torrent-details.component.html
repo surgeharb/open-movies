@@ -1,0 +1,38 @@
+<mat-progress-spinner [color]="spinner.$color" [mode]="spinner.$mode" *ngIf="spinner.$loading"></mat-progress-spinner>
+
+<div id="torrent" class="row" *ngIf="torrent.id">
+  <mat-card id="torrent-card">
+    <div class="cover">
+      <img mat-card-image [src]="torrent.poster_med" [alt]="torrent.title" class="torrent-img">
+      <img mat-card-image [src]="torrent.poster_big" [alt]="torrent.title" class="torrent-img">
+      <a class="btn-floating btn-large waves-effect waves-light red">
+        <i class="material-icons">play_arrow</i>
+      </a>
+    </div>
+    <mat-card-content class="content">
+      <p>
+        {{torrent.title}}
+        <span>({{torrent.year}})</span>
+      </p>
+      <p [innerHtml]="torrent.description"></p>
+      <p>Rating: {{torrent.rating}}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <a [href]="getItemLink(item)" *ngFor="let item of torrent.items" target="_blank">
+        <button mat-button>
+          <span>Seeds: {{item.torrent_seeds}}</span>
+          <br />
+          <span>Peers: {{item.torrent_peers}}</span>
+          <br />
+          <span>Size: {{getItemSize(item.size_bytes)}} GB</span>
+          <br />
+          <span>Quality: {{item.quality}}</span>
+          <br />
+        </button>
+      </a>
+    </mat-card-actions>
+  </mat-card>
+
+</div>
+
+<iframe id="trailer-frame" [src]="sanitizeResourceUrl(trailer)"></iframe>

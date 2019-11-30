@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
+import { debounceTime, map, filter, distinctUntilChanged, tap } from 'rxjs/operators';
 
 import { IPosterResponse } from '../interfaces/poster';
 import { ITorrent, ITorrentResponse } from '../interfaces/torrent';
@@ -11,12 +11,11 @@ import { ITorrent, ITorrentResponse } from '../interfaces/torrent';
 @Injectable()
 export class TorrentsService {
 
-  public scrollTrack = 0;
-  public lastMovie = false;
-  public movies = new BehaviorSubject(null);
-  public movieDetailed = new BehaviorSubject(null);
+  public lastTorrent = false;
+  public torrents = new BehaviorSubject(null);
+  public torrentDetailed = new BehaviorSubject(null);
 
-  private currentMovie: ITorrent = {};
+  private currentTorrent: ITorrent = {};
   private infoUrl = 'https://tinfo.ukfrnlge.xyz/3/movie';
   private baseUrl = 'https://api.ukfrnlge.xyz/list?sort=seeds&cb=&quality=720p,1080p,3d';
 
@@ -38,48 +37,41 @@ export class TorrentsService {
     return this.baseUrl + '&page=' + page + '&keywords=' + keywords;
   }
 
-  public get $movies(): ITorrent[] {
-    return this.movies.value;
+  public get $torrents(): ITorrent[] {
+    return this.torrents.value;
   }
 
-  public set $movies(value: ITorrent[]) {
-    this.movies.next(value);
+  public set $torrents(value: ITorrent[]) {
+    this.torrents.next(value);
   }
 
-  public get $movieDetailed(): boolean {
-    return this.movieDetailed.value;
+  public get $torrentDetailed(): boolean {
+    return this.torrentDetailed.value;
   }
 
-  public set $movieDetailed(value: boolean) {
-    this.movieDetailed.next(value);
+  public set $torrentDetailed(value: boolean) {
+    this.torrentDetailed.next(value);
   }
 
-  public get $currentMovie(): ITorrent {
-    return this.currentMovie;
+  public get $currentTorrent(): ITorrent {
+    return this.currentTorrent;
   }
 
-  public set $currentMovie(movie: ITorrent) {
-    if (!movie.id) {
-      this.$movieDetailed = false;
+  public set $currentTorrent(torrent: ITorrent) {
+    if (!torrent.id) {
+      this.$torrentDetailed = false;
     } else {
-      this.$movieDetailed = true;
+      this.$torrentDetailed = true;
     }
 
-    this.currentMovie = movie;
-  }
-
-  public get $scrollTrack(): number {
-    return this.scrollTrack;
-  }
-
-  public set $scrollTrack(value: number) {
-    this.scrollTrack = value;
+    this.currentTorrent = torrent;
   }
 
   public search(terms: Observable<any>) {
     return terms.pipe(
-      map(i => this.searchEntries(i.currentTarget.value)),
-      debounceTime(400)
+      debounceTime(400),
+      distinctUntilChanged(),
+      map(this.searchEntries.bind(this)),
     )
   }
 
@@ -93,19 +85,19 @@ export class TorrentsService {
     return this.httpClient.get<ITorrentResponse>(this.getUrl(this.tempKeywords, page));
   }
 
-  public getHomePageMovies = (): Observable<ITorrentResponse> => {
+  public getHomePageTorrents = (): Observable<ITorrentResponse> => {
     return this.httpClient.get<ITorrentResponse>(this.baseUrl);
   }
 
-  public getMovieDetails = (id: string): Observable<ITorrent> => {
-    return this.httpClient.get<ITorrent>(this.getUrl(id));
+  public getTorrentDetails = (id: string): Observable<ITorrentResponse> => {
+    return this.httpClient.get<ITorrentResponse>(this.getUrl(id));
   }
 
-  public getMovieMoreDetails = (id: string) => {
+  public getTorrentMoreDetails = (id: string) => {
     return this.httpClient.get(`${this.infoUrl}/${id}?api_key=6b6effafe7c0b6fa17191d0430f546f8`);
   }
 
-  public getMoviePosters = (id: string): Observable<IPosterResponse> => {
+  public getTorrentPosters = (id: string): Observable<IPosterResponse> => {
     return this.httpClient.get(`${this.infoUrl}/${id}/images?api_key=6b6effafe7c0b6fa17191d0430f546f8`);
   }
 

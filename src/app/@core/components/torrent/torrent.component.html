@@ -1,0 +1,4 @@
+<mat-card class="torrent-card" (click)="moreDetails(torrent.id)">
+  <span class="z-depth-1 torrent-year">{{torrent.year}}</span>
+  <img mat-card-image [defaultImage]="defaultImage" [lazyLoad]="torrent.poster_med" alt="{{torrent.title}}">
+</mat-card>
