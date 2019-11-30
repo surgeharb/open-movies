@@ -1,0 +1,7 @@
+<mat-progress-spinner [color]="spinner.$color" [mode]="spinner.$mode" *ngIf="spinner.$loading"></mat-progress-spinner>
+
+<section id="torrents">
+  <div id="movies" class="flex-container">
+    <app-movie *ngFor="let movie of movies" [details]="movie" class="flex-item"></app-movie>
+  </div>
+</section>
