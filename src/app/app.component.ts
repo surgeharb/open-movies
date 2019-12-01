@@ -23,6 +23,7 @@ export class AppComponent implements OnDestroy {
   public searchTerm$ = new Subject<string>();
 
   private subscriptions = [];
+  private firstTime = true;
 
   constructor(
     private readonly router: Router,
@@ -42,7 +43,11 @@ export class AppComponent implements OnDestroy {
     this.subscriptions.push(
       this.router.events.subscribe((val) => {
         if (val instanceof NavigationEnd) {
-          this.toggleSearch(false);
+          if (!this.firstTime) {
+            this.toggleSearch(false);
+          }
+         
+          this.firstTime = false;
         }
       })
     );
@@ -65,7 +70,7 @@ export class AppComponent implements OnDestroy {
       this.searchInput.nativeElement.focus();
     } else {
       this.searchBar.input = '';
-      this.searchTerm$.next('');
+      this.searchTerm$.next(this.torrentsService.EMPTY_TERM);
     }
   }
 

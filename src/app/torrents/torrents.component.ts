@@ -37,12 +37,17 @@ export class TorrentsComponent implements OnInit {
   }
 
   getTorrents() {
+    this.fetching = true;
     this.spinner.$loading = true;
     this.torrents = this.torrentsService.$torrents;
 
     this.torrentsService.getHomePageTorrents().subscribe(response => {
       this.torrentsService.$torrents = response.MovieList;
       this.spinner.$loading = false;
+
+      setTimeout(() => {
+        this.fetching = false;
+      }, 1000);
     });
   }
 

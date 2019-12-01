@@ -11,6 +11,8 @@ import { ITorrent, ITorrentResponse } from '../interfaces/torrent';
 @Injectable()
 export class TorrentsService {
 
+  public EMPTY_TERM = '#@_EMPTY_!$';
+
   public lastTorrent = false;
   public torrents = new BehaviorSubject(null);
   public torrentDetailed = new BehaviorSubject(null);
@@ -69,6 +71,7 @@ export class TorrentsService {
 
   public search(terms: Observable<any>) {
     return terms.pipe(
+      filter(Boolean),
       debounceTime(400),
       distinctUntilChanged(),
       map(this.searchEntries.bind(this)),
@@ -76,7 +79,8 @@ export class TorrentsService {
   }
 
   private async searchEntries(term: string): Promise<ITorrentResponse> {
-    this.tempKeywords = term;
+    console.log("TCL: TorrentsService -> term", term);
+    this.tempKeywords = term !== this.EMPTY_TERM ? term : '';
 
     return this.httpClient.get<ITorrentResponse>(this.getUrl(term)).toPromise();
   }
