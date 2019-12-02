@@ -24,7 +24,10 @@ export class SingleTorrentComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.torrent = this.details;
+    this.torrent = {
+      ...this.details,
+      poster_med: this.details.poster_med.replace('http://', 'https://'),
+    };
   }
 
   moreDetails(route) {

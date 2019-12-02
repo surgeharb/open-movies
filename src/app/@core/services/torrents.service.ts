@@ -66,7 +66,11 @@ export class TorrentsService {
       this.$torrentDetailed = true;
     }
 
-    this.currentTorrent = torrent;
+    this.currentTorrent = {
+      ...torrent, // torrent info details
+      poster_med: torrent.poster_med.replace('http://', 'https://'),
+      poster_big: torrent.poster_big.replace('http://', 'https://'),
+    };
   }
 
   public search(terms: Observable<any>) {
@@ -79,7 +83,6 @@ export class TorrentsService {
   }
 
   private async searchEntries(term: string): Promise<ITorrentResponse> {
-    console.log("TCL: TorrentsService -> term", term);
     this.tempKeywords = term !== this.EMPTY_TERM ? term : '';
 
     return this.httpClient.get<ITorrentResponse>(this.getUrl(term)).toPromise();
