@@ -3,8 +3,8 @@
 <div id="torrent" class="row" *ngIf="torrent.id">
   <mat-card id="torrent-card">
     <div class="cover">
-      <img mat-card-image [src]="torrent.poster_med" [alt]="torrent.title" class="torrent-img">
-      <img mat-card-image [src]="torrent.poster_big" [alt]="torrent.title" class="torrent-img">
+      <img mat-card-image [src]="torrent.poster_med.replace('http://', 'https://')" [alt]="torrent.title" class="torrent-img">
+      <img mat-card-image [src]="torrent.poster_big.replace('http://', 'https://')" [alt]="torrent.title" class="torrent-img">
       <a class="btn-floating btn-large waves-effect waves-light red">
         <i class="material-icons">play_arrow</i>
       </a>

@@ -66,11 +66,7 @@ export class TorrentsService {
       this.$torrentDetailed = true;
     }
 
-    this.currentTorrent = {
-      ...torrent, // torrent info details
-      poster_med: torrent.poster_med.replace('http://', 'https://'),
-      poster_big: torrent.poster_big.replace('http://', 'https://'),
-    };
+    this.currentTorrent = torrent;
   }
 
   public search(terms: Observable<any>) {
