@@ -55,9 +55,7 @@ export class TorrentDetailsComponent implements OnInit {
           this.torrentsService.lastTorrent = true;
           this.torrentsService.$currentTorrent = { ...this.torrent };
   
-          let trailer = this.torrent.trailer;
-          let options = 'autoplay=1&showinfo=0&controls=0&rel=0';
-          this.trailer = `https://youtube.com/embed/${trailer}?${options}`;
+          this.trailer = `https://youtube.com/embed/${this.torrent.trailer}`;
         });
       });
   
