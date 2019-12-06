@@ -1,14 +1,17 @@
 <mat-progress-spinner [color]="spinner.$color" [mode]="spinner.$mode" *ngIf="spinner.$loading"></mat-progress-spinner>
 
-<div id="torrent" class="row" *ngIf="torrent.id">
+<div id="torrent" class="row" *ngIf="torrent && torrent.id">
   <mat-card id="torrent-card">
     <div class="cover">
-      <img mat-card-image [src]="torrent.poster_med.replace('http://', 'https://')" [alt]="torrent.title" class="torrent-img">
-      <img mat-card-image [src]="torrent.poster_big.replace('http://', 'https://')" [alt]="torrent.title" class="torrent-img">
+      <img mat-card-image [src]="torrent.poster_med.replace('http://', 'https://')" [alt]="torrent.title"
+        class="torrent-img">
+      <img mat-card-image [src]="torrent.poster_big.replace('http://', 'https://')" [alt]="torrent.title"
+        class="torrent-img">
       <a class="btn-floating btn-large waves-effect waves-light red">
         <i class="material-icons">play_arrow</i>
       </a>
     </div>
+
     <mat-card-content class="content">
       <p>
         {{torrent.title}}
@@ -17,7 +20,8 @@
       <p [innerHtml]="torrent.description"></p>
       <p>Rating: {{torrent.rating}}</p>
     </mat-card-content>
-    <mat-card-actions>
+
+    <mat-card-actions *ngIf="torrentType === 'movie'">
       <a [href]="getItemLink(item)" *ngFor="let item of torrent.items" target="_blank">
         <button mat-button>
           <span>Seeds: {{item.torrent_seeds}}</span>
@@ -31,8 +35,32 @@
         </button>
       </a>
     </mat-card-actions>
+
+    <mat-card-actions *ngIf="torrentType === 'show'">
+      <div *ngFor="let season of torrent.seasons">
+        <span>Season {{season.number}}</span>
+
+        <ul>
+          <li *ngFor="let episode of season.episodes">
+            <span>Episode {{episode.episode}}</span>
+            <a [href]="getItemLink(item)" *ngFor="let item of episode.items" target="_blank">
+              <button mat-button>
+                <span>Seeds: {{item.torrent_seeds}}</span>
+                <br />
+                <span>Peers: {{item.torrent_peers}}</span>
+                <br />
+                <span>Size: {{getItemSize(item.size_bytes)}} GB</span>
+                <br />
+                <span>Quality: {{item.quality}}</span>
+                <br />
+              </button>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </mat-card-actions>
   </mat-card>
 
 </div>
 
-<iframe id="trailer-frame" [src]="sanitizeResourceUrl(trailer)" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe #iframe allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" src="about:blank" frameborder="0" allowfullscreen></iframe>

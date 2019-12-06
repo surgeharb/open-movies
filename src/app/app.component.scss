@@ -16,6 +16,11 @@ mat-toolbar {
   flex-grow: 1;
 }
 
+.dropdown-icon {
+  position: relative;
+  top: 5px;
+}
+
 #search {
   left: 0;
   right: 0;
@@ -33,7 +38,7 @@ mat-toolbar {
     top: 0px;
   }
   .back {
-    top: -3px;
+    top: -4px;
     margin: 0 .5rem;
     position: relative;
   }

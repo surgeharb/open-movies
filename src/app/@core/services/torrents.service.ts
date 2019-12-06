@@ -3,23 +3,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { debounceTime, map, filter, distinctUntilChanged, tap } from 'rxjs/operators';
+import { debounceTime, map, filter } from 'rxjs/operators';
 
-import { IPosterResponse } from '../interfaces/poster';
 import { ITorrent, ITorrentResponse } from '../interfaces/torrent';
 
 @Injectable()
 export class TorrentsService {
 
-  public EMPTY_TERM = '#@_EMPTY_!$';
-
   public lastTorrent = false;
   public torrents = new BehaviorSubject(null);
-  public torrentDetailed = new BehaviorSubject(null);
+  public currentTorrent = new BehaviorSubject(null);
 
-  private currentTorrent: ITorrent = {};
-  private infoUrl = 'https://tinfo.ukfrnlge.xyz/3/movie';
-  private baseUrl = 'https://api.ukfrnlge.xyz/list?sort=seeds&cb=&quality=720p,1080p,3d';
+  private torrentsListType = 'movies';
+  private baseUrl = 'https://api.ukfrnlge.xyz';
 
   constructor(
     private httpClient: HttpClient,
@@ -27,16 +23,19 @@ export class TorrentsService {
 
   private tempKeywords = ''; // temp keywords for loadMore
 
-  private getUrl(keywords?: string, page?: Number): string {
-    if (!page) {
-      page = 1;
-    }
+  private getUrl(keywords = '', page = 1) {
+    const params = 'sort=seeds&cb=&quality=720p,1080p,3d';
+    const torrentsType = this.torrentsListType === 'movies' ? 'list' : 'shows';
+    return `${this.baseUrl}/${torrentsType}?${params}&page=${page}&keywords=${keywords}`;
+  }
 
-    if (!keywords) {
-      keywords = '';
-    }
+  private getSingleShowUrl(imdbId: string) {
+    return `${this.baseUrl}/show?imdb=${imdbId}`;
+  }
 
-    return this.baseUrl + '&page=' + page + '&keywords=' + keywords;
+  public set $torrentsListType(type: 'movies' | 'series') {
+    this.torrentsListType =
+      type === 'movies' ? 'movies' : 'series';
   }
 
   public get $torrents(): ITorrent[] {
@@ -47,61 +46,42 @@ export class TorrentsService {
     this.torrents.next(value);
   }
 
-  public get $torrentDetailed(): boolean {
-    return this.torrentDetailed.value;
-  }
-
-  public set $torrentDetailed(value: boolean) {
-    this.torrentDetailed.next(value);
-  }
-
   public get $currentTorrent(): ITorrent {
-    return this.currentTorrent;
+    return this.currentTorrent.value;
   }
 
   public set $currentTorrent(torrent: ITorrent) {
-    if (!torrent.id) {
-      this.$torrentDetailed = false;
-    } else {
-      this.$torrentDetailed = true;
-    }
-
-    this.currentTorrent = torrent;
+    this.currentTorrent.next(torrent);
   }
 
   public search(terms: Observable<any>) {
     return terms.pipe(
-      filter(Boolean),
       debounceTime(400),
-      distinctUntilChanged(),
+      filter(val => val !== undefined),
       map(this.searchEntries.bind(this)),
     )
   }
 
   private async searchEntries(term: string): Promise<ITorrentResponse> {
-    this.tempKeywords = term !== this.EMPTY_TERM ? term : '';
+    this.tempKeywords = term;
 
     return this.httpClient.get<ITorrentResponse>(this.getUrl(term)).toPromise();
   }
 
-  public loadMore(page: Number): Observable<ITorrentResponse> {
+  public loadMore(page: number): Observable<ITorrentResponse> {
     return this.httpClient.get<ITorrentResponse>(this.getUrl(this.tempKeywords, page));
   }
 
   public getHomePageTorrents = (): Observable<ITorrentResponse> => {
-    return this.httpClient.get<ITorrentResponse>(this.baseUrl);
+    return this.httpClient.get<ITorrentResponse>(this.getUrl());
   }
 
   public getTorrentDetails = (id: string): Observable<ITorrentResponse> => {
     return this.httpClient.get<ITorrentResponse>(this.getUrl(id));
   }
 
-  public getTorrentMoreDetails = (id: string) => {
-    return this.httpClient.get(`${this.infoUrl}/${id}?api_key=6b6effafe7c0b6fa17191d0430f546f8`);
-  }
-
-  public getTorrentPosters = (id: string): Observable<IPosterResponse> => {
-    return this.httpClient.get(`${this.infoUrl}/${id}/images?api_key=6b6effafe7c0b6fa17191d0430f546f8`);
+  public getShowDataItems = (imdbId: string): Observable<Object> => {
+    return this.httpClient.get<Object>(this.getSingleShowUrl(imdbId));
   }
 
 }

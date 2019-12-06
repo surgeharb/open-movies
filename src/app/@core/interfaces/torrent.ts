@@ -1,5 +1,10 @@
 import { IItem } from './item';
 
+export interface ISeason {
+  number: number;
+  episodes: [{ title: string, items: [IItem] }];
+}
+
 export interface ITorrent {
   id?: string;
   title?: string;
@@ -18,6 +23,8 @@ export interface ITorrent {
   genres?: [string];
   items?: [IItem];
   items_lang?: [IItem];
+
+  seasons?: ISeason[];
 }
 
 export interface ITorrentResponse {

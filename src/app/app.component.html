@@ -6,14 +6,29 @@
         <button class="back" type="button" mat-icon-button (click)="toggleSearch()"><mat-icon>arrow_back</mat-icon></button>   
         <input type="text" name="search" #search placeholder="Search for your favorite movie..." autocomplete="off" [(ngModel)]="searchBar.input" (keyup)="searchTerm$.next($event.target.value)" />   
       </form>
+
       <button type="button" mat-icon-button (click)="getBack()" *ngIf="inDetails">
         <mat-icon>arrow_back</mat-icon>
       </button>
-      <h5 id="title">Latest Torrents</h5>
+
+      <h5 *ngIf="inDetails">{{currentTorrent.title}}</h5>
+
+      <h5 [matMenuTriggerFor]="menu" *ngIf="!inDetails">
+        <span>Latest Torrents: </span>
+        <span style="cursor:pointer">{{torrentsListType}}</span>
+        <mat-icon style="cursor:pointer" class="dropdown-icon">arrow_drop_down</mat-icon>
+      </h5>
+
       <span class="flex-spacer"></span>
+
       <button type="button" mat-icon-button (click)="toggleSearch()" *ngIf="!inDetails">
         <mat-icon>search</mat-icon>
       </button>
+
+      <mat-menu #menu="matMenu" xPosition="before">
+        <button mat-menu-item (click)="changeTorrentType('movies')">Movies</button>
+        <button mat-menu-item (click)="changeTorrentType('series')">Series</button>
+      </mat-menu>
     </mat-toolbar-row>
   </mat-toolbar>
 

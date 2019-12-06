@@ -27,7 +27,7 @@ export class SingleTorrentComponent implements OnInit {
     this.torrent = this.details;
   }
 
-  moreDetails(route) {
+  moreDetails(route: string) {
     this.torrentsService.$currentTorrent = this.torrent;
     this.router.navigate([`torrents/${route}`]);
   }

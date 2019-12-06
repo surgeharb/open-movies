@@ -7,6 +7,7 @@ import {
   MatCardModule,
   MatIconModule,
   MatInputModule,
+  MatMenuModule,
   MatProgressSpinnerModule
 } from '@angular/material';
 
@@ -17,6 +18,7 @@ const MaterialModulesArray = [
   MatCardModule,
   MatIconModule,
   MatInputModule,
+  MatMenuModule,
   MatProgressSpinnerModule
 ]
 

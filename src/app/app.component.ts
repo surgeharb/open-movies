@@ -1,9 +1,9 @@
 import { Component, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { TorrentsService } from './@core/services/torrents.service';
-import { ITorrentResponse } from './@core/interfaces/torrent';
-import { Location } from '@angular/common';
+import { ITorrentResponse, ITorrent } from './@core/interfaces/torrent';
 import { Router, NavigationEnd } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Location } from '@angular/common';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -20,23 +20,28 @@ export class AppComponent implements OnDestroy {
   };
 
   public inDetails = false;
-  public searchTerm$ = new Subject<string>();
+  public currentTorrent: ITorrent;
+
+  public searchTerm$ = new BehaviorSubject<string>('');
+
+  public torrentsListType = 'Movies';
 
   private subscriptions = [];
   private firstTime = true;
 
   constructor(
     private readonly router: Router,
-    private readonly _location: Location,
     private readonly torrentsService: TorrentsService,
+    private readonly _location: Location,
   ) {
     this.subscriptions.push(
       this.torrentsService.search(this.searchTerm$).subscribe(this.getSearchResults.bind(this))
     );
 
     this.subscriptions.push(
-      this.torrentsService.torrentDetailed.subscribe((value: boolean) => {
-        this.inDetails = value;
+      this.torrentsService.currentTorrent.subscribe((torrent: ITorrent) => {
+        this.currentTorrent = torrent;
+        this.inDetails = !!torrent;
       })
     );
 
@@ -46,32 +51,50 @@ export class AppComponent implements OnDestroy {
           if (!this.firstTime) {
             this.toggleSearch(false);
           }
-         
+
           this.firstTime = false;
         }
       })
     );
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.changeTorrentType('series');
+  }
 
   private async getSearchResults(results: Promise<ITorrentResponse>) {
     this.torrentsService.$torrents = (await results).MovieList;
   }
 
   public toggleSearch(forceValue?: boolean) {
-    this.searchBar.opened = !this.searchBar.opened;
 
     if (forceValue !== undefined) {
       this.searchBar.opened = forceValue;
+
+      if (this.searchBar.opened === forceValue) {
+        return;
+      }
+
+    } else {
+      this.searchBar.opened = !this.searchBar.opened;
     }
 
     if (this.searchBar.opened) {
       this.searchInput.nativeElement.focus();
     } else {
       this.searchBar.input = '';
-      this.searchTerm$.next(this.torrentsService.EMPTY_TERM);
+
+      if (this.searchTerm$.getValue().trim()) {
+        this.searchTerm$.next('');
+      }
     }
+  }
+
+  public changeTorrentType(type: 'movies' | 'series') {
+    this.torrentsService.$torrentsListType = type;
+    this.torrentsListType = `${type.charAt(0).toUpperCase()}${type.substr(1)}`;
+
+    this.searchTerm$.next('');
   }
 
   public getBack() {
