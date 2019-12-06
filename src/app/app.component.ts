@@ -58,9 +58,7 @@ export class AppComponent implements OnDestroy {
     );
   }
 
-  ngOnInit() {
-    this.changeTorrentType('series');
-  }
+  ngOnInit() {}
 
   private async getSearchResults(results: Promise<ITorrentResponse>) {
     this.torrentsService.$torrents = (await results).MovieList;
