@@ -49,7 +49,7 @@ export class AppComponent implements OnDestroy {
       this.router.events.subscribe((val) => {
         if (val instanceof NavigationEnd) {
           if (!this.firstTime) {
-            this.toggleSearch(false);
+            this.toggleSearch(false, true);
           }
 
           this.firstTime = false;
@@ -64,12 +64,12 @@ export class AppComponent implements OnDestroy {
     this.torrentsService.$torrents = (await results).MovieList;
   }
 
-  public toggleSearch(forceValue?: boolean) {
+  public toggleSearch(forceValue?: boolean, forceRefresh?: boolean) {
 
     if (forceValue !== undefined) {
       this.searchBar.opened = forceValue;
 
-      if (this.searchBar.opened === forceValue) {
+      if (this.searchBar.opened === forceValue && !forceRefresh) {
         return;
       }
 
