@@ -35,7 +35,6 @@ export class TorrentDetailsComponent implements OnInit {
   }
 
   public getItemLink(item: any) {
-    console.log("TCL: TorrentDetailsComponent -> getItemLink -> item", item)
     return this.sanitizeResourceUrl(item.torrent_url || item.torrent_magnet);
   }
 

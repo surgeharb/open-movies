@@ -4,9 +4,9 @@
   <mat-card id="torrent-card">
     <div class="cover">
       <img mat-card-image [src]="torrent.poster_med.replace('http://', 'https://')" [alt]="torrent.title"
-        class="torrent-img">
+        class="torrent-img" style="min-height:300px">
       <img mat-card-image [src]="torrent.poster_big.replace('http://', 'https://')" [alt]="torrent.title"
-        class="torrent-img">
+        class="torrent-img" style="min-height:300px">
       <a class="btn-floating btn-large waves-effect waves-light red">
         <i class="material-icons">play_arrow</i>
       </a>
