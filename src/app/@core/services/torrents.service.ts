@@ -57,7 +57,7 @@ export class TorrentsService {
   public search(terms: Observable<any>) {
     return terms.pipe(
       debounceTime(400),
-      filter(val => val !== undefined),
+      filter(val => val !== null),
       map(this.searchEntries.bind(this)),
     )
   }

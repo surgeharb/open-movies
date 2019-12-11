@@ -11,6 +11,8 @@ import { AppComponent } from './app.component';
 
 import { TorrentsModule } from './torrents/torrents.module';
 import { TorrentDetailsModule } from './torrent-details/torrent-details.module';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,7 @@ import { TorrentDetailsModule } from './torrent-details/torrent-details.module';
 
     TorrentsModule,
     TorrentDetailsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [TorrentsService],
   bootstrap: [AppComponent]

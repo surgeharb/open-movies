@@ -22,7 +22,7 @@ export class AppComponent implements OnDestroy {
   public inDetails = false;
   public currentTorrent: ITorrent;
 
-  public searchTerm$ = new BehaviorSubject<string>('');
+  public searchTerm$ = new BehaviorSubject<string>(null);
 
   public torrentsListType = 'Movies';
 
@@ -49,6 +49,7 @@ export class AppComponent implements OnDestroy {
       this.router.events.subscribe((val) => {
         if (val instanceof NavigationEnd) {
           if (!this.firstTime) {
+            console.log('val', val);
             this.toggleSearch(false, true);
           }
 
