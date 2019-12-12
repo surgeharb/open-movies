@@ -48,9 +48,8 @@ export class AppComponent implements OnDestroy {
     this.subscriptions.push(
       this.router.events.subscribe((val) => {
         if (val instanceof NavigationEnd) {
-          if (!this.firstTime) {
-            console.log('val', val);
-            this.toggleSearch(false, true);
+          if (!this.firstTime && this.searchTerm$.getValue()) {
+            this.toggleSearch();
           }
 
           this.firstTime = false;
@@ -65,13 +64,19 @@ export class AppComponent implements OnDestroy {
     this.torrentsService.$torrents = (await results).MovieList;
   }
 
-  public toggleSearch(forceValue?: boolean, forceRefresh?: boolean) {
+  public toggleSearch(forceValue?: boolean) {
 
     if (forceValue !== undefined) {
+
+      if (this.searchBar.opened === forceValue) {
+        return;
+      }
+
       this.searchBar.opened = forceValue;
 
-      if (this.searchBar.opened === forceValue && !forceRefresh) {
-        return;
+      if (forceValue === false && this.searchTerm$.getValue() == this.searchBar.input) {
+        this.searchBar.input = '';
+        this.searchTerm$.next('');
       }
 
     } else {
@@ -80,12 +85,6 @@ export class AppComponent implements OnDestroy {
 
     if (this.searchBar.opened) {
       this.searchInput.nativeElement.focus();
-    } else {
-      this.searchBar.input = '';
-
-      if (this.searchTerm$.getValue().trim()) {
-        this.searchTerm$.next('');
-      }
     }
   }
 

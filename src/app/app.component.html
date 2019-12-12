@@ -3,7 +3,7 @@
   <mat-toolbar color="primary">
     <mat-toolbar-row class="mat-elevation-z6">
       <form id="search" [ngClass]="{ 'opened': searchBar.opened }">
-        <button class="back" type="button" mat-icon-button (click)="toggleSearch()"><mat-icon>arrow_back</mat-icon></button>   
+        <button class="back" type="button" mat-icon-button (click)="toggleSearch(false)"><mat-icon>arrow_back</mat-icon></button>   
         <input type="text" name="search" #search placeholder="Search for your favorite movie..." autocomplete="off" [(ngModel)]="searchBar.input" (keyup)="searchTerm$.next($event.target.value)" />   
       </form>
 
