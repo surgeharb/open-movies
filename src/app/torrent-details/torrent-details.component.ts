@@ -43,6 +43,34 @@ export class TorrentDetailsComponent implements OnInit {
     return Math.round(gegaBytes * 100) / 100;
   }
 
+  handleTorrent(response) {
+    this.torrent = response.MovieList[0];
+    this.torrentsService.lastTorrent = true;
+    this.torrentsService.$currentTorrent = { ...this.torrent };
+
+    if (!this.torrent) {
+      return false;
+    }
+
+    this.torrent.description = decodeURI(this.torrent.description);
+
+    this.trailer = `https://youtube.com/embed/${this.torrent.trailer}`;
+
+    this.iframe.nativeElement.contentWindow.location.replace(this.trailer);
+
+    if (!this.torrent.items.length) {
+      this.torrentType = 'show';
+
+      this.torrentsService.getShowDataItems(this.torrent.imdb).pipe(take(1)).subscribe((response) => {
+        const formatSeasons = (season: any) => ({ episodes: season, number: +season[0].season });
+        this.torrent.seasons = Object.values(response).map(formatSeasons);
+      });
+    }
+
+    this.spinner.$loading = false;
+    return true;
+  }
+
   ngOnInit() {
     this.torrent = this.torrentsService.$currentTorrent;
     this.spinner.$loading = !this.torrent;
@@ -52,25 +80,15 @@ export class TorrentDetailsComponent implements OnInit {
         this.id = params['id'];
 
         if (!this.id) { return false; }
-  
+
         this.torrentsService.getTorrentDetails(`${this.id}`).pipe(take(1)).subscribe((response) => {
-          this.torrent = response.MovieList[0];
-          this.spinner.$loading = false;
-          this.torrentsService.lastTorrent = true;
-          this.torrentsService.$currentTorrent = { ...this.torrent };
-  
-          this.torrent.description = decodeURI(this.torrent.description);
-  
-          this.trailer = `https://youtube.com/embed/${this.torrent.trailer}`;
+          const result = this.handleTorrent(response);
 
-          this.iframe.nativeElement.contentWindow.location.replace(this.trailer);
-
-          if (!this.torrent.items.length) {
-            this.torrentType = 'show';
-
-            this.torrentsService.getShowDataItems(this.torrent.imdb).pipe(take(1)).subscribe((response) => {
-              const formatSeasons = (season: any) => ({ episodes: season, number: +season[0].season });
-              this.torrent.seasons = Object.values(response).map(formatSeasons);
+          if (!result) {
+            this.spinner.$loading = true;
+            this.torrentsService.$torrentsListType = 'series';
+            this.torrentsService.getTorrentDetails(`${this.id}`).pipe(take(1)).subscribe((response) => {
+              this.handleTorrent(response);
             });
           }
         });

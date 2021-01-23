@@ -2,7 +2,6 @@ import { Component, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { TorrentsService } from './@core/services/torrents.service';
 import { ITorrentResponse, ITorrent } from './@core/interfaces/torrent';
 import { Router, NavigationEnd } from '@angular/router';
-import { Location } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -32,7 +31,6 @@ export class AppComponent implements OnDestroy {
   constructor(
     private readonly router: Router,
     private readonly torrentsService: TorrentsService,
-    private readonly _location: Location,
   ) {
     this.subscriptions.push(
       this.torrentsService.search(this.searchTerm$).subscribe(this.getSearchResults.bind(this))
@@ -58,7 +56,11 @@ export class AppComponent implements OnDestroy {
     );
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (this.torrentsService.$torrentsListType === 'series' && this.torrentsListType.toLowerCase() !== this.torrentsService.$torrentsListType) {
+      this.changeTorrentType('series');
+    }
+  }
 
   private async getSearchResults(results: Promise<ITorrentResponse>) {
     this.torrentsService.$torrents = (await results).MovieList;
@@ -93,10 +95,6 @@ export class AppComponent implements OnDestroy {
     this.torrentsListType = `${type.charAt(0).toUpperCase()}${type.substr(1)}`;
 
     this.searchTerm$.next('');
-  }
-
-  public getBack() {
-    this._location.back();
   }
 
   ngOnDestroy() {
