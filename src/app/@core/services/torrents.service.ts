@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -9,33 +8,43 @@ import { ITorrent, ITorrentResponse } from '../interfaces/torrent';
 
 @Injectable()
 export class TorrentsService {
-
   public lastTorrent = false;
   public torrents = new BehaviorSubject(null);
   public currentTorrent = new BehaviorSubject(null);
 
   private torrentsListType = 'movies';
-  private baseUrl = 'https://api.ukfrnlge.xyz';
+  private baseUrl = 'http://api.pctapi.com';
 
-  constructor(
-    private httpClient: HttpClient,
-  ) { }
+  constructor(private httpClient: HttpClient) {}
 
   private tempKeywords = ''; // temp keywords for loadMore
 
-  private getUrl(keywords = '', page = 1) {
+  private getUrl(keywords = '', page = 2) {
     const params = 'sort=seeds&cb=&quality=720p,1080p,3d';
     const torrentsType = this.torrentsListType === 'movies' ? 'list' : 'shows';
     return `${this.baseUrl}/${torrentsType}?${params}&page=${page}&keywords=${keywords}`;
   }
 
-  private getSingleShowUrl(imdbId: string) {
+  private getTorrentDetailsUrl(id: string) {
+    return this.torrentsListType === 'movies'
+      ? this.getMovieUrl(id)
+      : this.getShowUrl(id);
+  }
+
+  private getMovieUrl(id: string) {
+    return `${this.baseUrl}/movie?cb=&quality=720p,1080p,3d&page=4&imdb=tt${id}`;
+  }
+
+  private getShowUrl(id: string) {
+    return `${this.baseUrl}/show?cb=&quality=720p,1080p,3d&imdb=tt${id}`;
+  }
+
+  private getShowDataItemsUrl(imdbId: string) {
     return `${this.baseUrl}/show?imdb=${imdbId}`;
   }
 
   public set $torrentsListType(type: 'movies' | 'series') {
-    this.torrentsListType =
-      type === 'movies' ? 'movies' : 'series';
+    this.torrentsListType = type === 'movies' ? 'movies' : 'series';
   }
 
   public get $torrents(): ITorrent[] {
@@ -57,9 +66,9 @@ export class TorrentsService {
   public search(terms: Observable<any>) {
     return terms.pipe(
       debounceTime(400),
-      filter(val => val !== null),
-      map(this.searchEntries.bind(this)),
-    )
+      filter((val) => val !== null),
+      map(this.searchEntries.bind(this))
+    );
   }
 
   private async searchEntries(term: string): Promise<ITorrentResponse> {
@@ -69,19 +78,20 @@ export class TorrentsService {
   }
 
   public loadMore(page: number): Observable<ITorrentResponse> {
-    return this.httpClient.get<ITorrentResponse>(this.getUrl(this.tempKeywords, page));
+    return this.httpClient.get<ITorrentResponse>(
+      this.getUrl(this.tempKeywords, page)
+    );
   }
 
-  public getHomePageTorrents = (): Observable<ITorrentResponse> => {
+  public getHomePageTorrents(): Observable<ITorrentResponse> {
     return this.httpClient.get<ITorrentResponse>(this.getUrl());
   }
 
-  public getTorrentDetails = (id: string): Observable<ITorrentResponse> => {
-    return this.httpClient.get<ITorrentResponse>(this.getUrl(id));
+  public getTorrentDetails(id: string): Observable<ITorrentResponse> {
+    return this.httpClient.get<ITorrentResponse>(this.getTorrentDetailsUrl(id));
   }
 
-  public getShowDataItems = (imdbId: string): Observable<Object> => {
-    return this.httpClient.get<Object>(this.getSingleShowUrl(imdbId));
+  public getShowDataItems(imdbId: string): Observable<object> {
+    return this.httpClient.get<object>(this.getShowDataItemsUrl(imdbId));
   }
-
 }

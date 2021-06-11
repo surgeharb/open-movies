@@ -1,4 +1,10 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
 import { ITorrent, ISeason } from '../@core/interfaces/torrent';
 import { Spinner } from '../@core/models/spinner';
 import { ActivatedRoute } from '@angular/router';
@@ -9,10 +15,9 @@ import { take } from 'rxjs/operators';
 @Component({
   selector: 'app-torrent-details',
   templateUrl: './torrent-details.component.html',
-  styleUrls: ['./torrent-details.component.scss']
+  styleUrls: ['./torrent-details.component.scss'],
 })
-export class TorrentDetailsComponent implements OnInit {
-
+export class TorrentDetailsComponent implements OnInit, OnDestroy {
   @ViewChild('iframe', { static: false }) iframe: ElementRef;
 
   private sub: any;
@@ -27,8 +32,8 @@ export class TorrentDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
-    private torrentsService: TorrentsService,
-  ) { }
+    private torrentsService: TorrentsService
+  ) {}
 
   public sanitizeResourceUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -39,12 +44,12 @@ export class TorrentDetailsComponent implements OnInit {
   }
 
   public getItemSize(bytes: number) {
-    let gegaBytes = bytes / 1e9;
+    const gegaBytes = bytes / 1e9;
     return Math.round(gegaBytes * 100) / 100;
   }
 
   handleTorrent(response) {
-    this.torrent = response.MovieList[0];
+    this.torrent = response;
     this.torrentsService.lastTorrent = true;
     this.torrentsService.$currentTorrent = { ...this.torrent };
 
@@ -61,10 +66,16 @@ export class TorrentDetailsComponent implements OnInit {
     if (!this.torrent.items.length) {
       this.torrentType = 'show';
 
-      this.torrentsService.getShowDataItems(this.torrent.imdb).pipe(take(1)).subscribe((response) => {
-        const formatSeasons = (season: any) => ({ episodes: season, number: +season[0].season });
-        this.torrent.seasons = Object.values(response).map(formatSeasons);
-      });
+      this.torrentsService
+        .getShowDataItems(this.torrent.imdb)
+        .pipe(take(1))
+        .subscribe((response) => {
+          const formatSeasons = (season: any) => ({
+            episodes: season,
+            number: +season[0].season,
+          });
+          this.torrent.seasons = Object.values(response).map(formatSeasons);
+        });
     }
 
     this.spinner.$loading = false;
@@ -76,22 +87,30 @@ export class TorrentDetailsComponent implements OnInit {
     this.spinner.$loading = !this.torrent;
 
     if (!this.sub) {
-      this.sub = this.route.params.subscribe(params => {
-        this.id = params['id'];
+      this.sub = this.route.params.subscribe((params) => {
+        this.id = params.id;
 
-        if (!this.id) { return false; }
+        if (!this.id) {
+          return false;
+        }
 
-        this.torrentsService.getTorrentDetails(`${this.id}`).pipe(take(1)).subscribe((response) => {
-          const result = this.handleTorrent(response);
+        this.torrentsService
+          .getTorrentDetails(`${this.id}`)
+          .pipe(take(1))
+          .subscribe((response) => {
+            const result = this.handleTorrent(response);
 
-          if (!result) {
-            this.spinner.$loading = true;
-            this.torrentsService.$torrentsListType = 'series';
-            this.torrentsService.getTorrentDetails(`${this.id}`).pipe(take(1)).subscribe((response) => {
-              this.handleTorrent(response);
-            });
-          }
-        });
+            if (!result) {
+              this.spinner.$loading = true;
+              this.torrentsService.$torrentsListType = 'series';
+              this.torrentsService
+                .getTorrentDetails(`${this.id}`)
+                .pipe(take(1))
+                .subscribe((response) => {
+                  this.handleTorrent(response);
+                });
+            }
+          });
       });
     }
   }
@@ -103,5 +122,4 @@ export class TorrentDetailsComponent implements OnInit {
 
     this.torrentsService.$currentTorrent = null;
   }
-
 }
